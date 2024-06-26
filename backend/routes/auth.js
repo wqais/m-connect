@@ -3,7 +3,7 @@
 const express = require("express");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-
+const bcrypt = require("bcryptjs");
 const app = express();
 
 app.post("/register", async (req, res) => {
@@ -57,9 +57,9 @@ app.post("/login", async (req, res) => {
     });
 
     res
+      .cookie("token", token, { httpOnly: true, secure: true, sameSite: 'Strict' }) // Set cookie options as required
       .status(200)
       .json({
-        token,
         user: {
           id: user._id,
           name: user.name,
@@ -72,6 +72,10 @@ app.post("/login", async (req, res) => {
       .status(500)
       .json({ message: "Something went wrong", error: err.message });
   }
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("token").status(200).json({ message: "Logged out successfully" });
 });
 
 module.exports = app;
