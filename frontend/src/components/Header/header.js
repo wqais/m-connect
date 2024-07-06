@@ -1,14 +1,26 @@
+// src/components/Header/header.js
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaUserFriends, FaEnvelope, FaBell } from 'react-icons/fa';
+import axios from 'axios';
 import './header.css';
 
 const Header = () => {
     const navigate = useNavigate();
 
-    const handleSignOut = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
+    const handleSignOut = async () => {
+        try {
+            await axios.post('http://localhost:5000/api/auth/logout', {}, {
+                withCredentials: true
+            });
+            // Clear the token from localStorage
+            localStorage.removeItem('token');
+            // Redirect to the login page
+            navigate('/login');
+        } catch (error) {
+            console.error('Error during sign out:', error);
+        }
     };
 
     return (

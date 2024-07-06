@@ -9,9 +9,11 @@ import {
   createRoutesFromElements,
   RouterProvider,
 } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import Search from "./screens/Search/search";
 import Network from "./screens/Network/network";
 import Profile from "./screens/Profile/profile";
+import { setCssVariables } from './theme/colors';
+setCssVariables();  // Set CSS variables
 // import Header from "./components/Header/header";
 
 function App() {
@@ -22,7 +24,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/network" element={<Network />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/home" element={<ProtectedRoute component={Home} />} />
+        <Route path="/home/:username" element={<Home/>}/>
+        <Route path="/search" element={<Search />} />
       </>
     )
   );

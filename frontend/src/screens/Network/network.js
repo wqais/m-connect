@@ -1,84 +1,151 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import './network.css';
-import Header from '../../components/Header/header';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { FaSearch, FaUser, FaCheck, FaTimes, FaUserPlus } from "react-icons/fa";
+import "./network.css";
+import Header from "../../components/Header/header";
 
 const Network = () => {
-    const [profile, setProfile] = useState({ connections: 0 });
-    const [pendingRequests, setPendingRequests] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [alertMessage, setAlertMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [requests, setRequests] = useState([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const token = Cookies.get('token');
-                const headers = { 'Authorization': `Bearer ${token}` };
-
-                // Fetch user profile
-                const profileResponse = await axios.get('http://localhost:5000/api/profile', { headers });
-                setProfile(profileResponse.data);
-
-                // Fetch pending requests
-                const requestsResponse = await axios.get('http://localhost:5000/api/network', { headers });
-                setPendingRequests(requestsResponse.data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setAlertMessage('An error occurred while fetching data.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    const handleRequest = async (id, action) => {
-        try {
-            const token = Cookies.get('token');
-            const headers = { 'Authorization': `Bearer ${token}` };
-            await axios.post(`http://localhost:5000/api/network/${action}`, { id }, { headers });
-            setPendingRequests(pendingRequests.filter(request => request._id !== id));
-            setAlertMessage(`Request ${action === 'accept' ? 'accepted' : 'denied'} successfully.`);
-        } catch (error) {
-            console.error('Error handling request:', error);
-            setAlertMessage(`An error occurred while ${action === 'accept' ? 'accepting' : 'denying'} the request.`);
-        }
+  useEffect(() => {
+    // Fetch incoming requests on component mount
+    const fetchRequests = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/api/requests", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setRequests(response.data);
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+      }
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    fetchRequests();
+  }, []);
 
-    return (
-        <div>
-            <Header />
-        <div className="network-container">
-            {alertMessage && <div className="alert">{alertMessage}</div>}
-            <div className="profile">
-                <h2>User Profile</h2>
-                <p>Connections: {profile.connections}</p>
-            </div>
-            <div className="pending-requests">
-                <h2>Pending Requests</h2>
-                {pendingRequests.length === 0 ? (
-                    <p>No pending requests.</p>
-                ) : (
-                    pendingRequests.map(request => (
-                        <div key={request._id} className="request-card">
-                            <h3>{request.sender.name}</h3>
-                            <p>{request.sender.summary}</p>
-                            <button onClick={() => handleRequest(request._id, 'accept')}>Connect</button>
-                            <button onClick={() => handleRequest(request._id, 'deny')}>Deny</button>
-                            <p className="timestamp">Received: {new Date(request.timestamp).toLocaleString()}</p>
-                        </div>
-                    ))
-                )}
-            </div>
+  const handleSearch = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:5000/search/people?term=${searchTerm}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Error searching for people:", error);
+    }
+  };
+
+  const handleRequestAction = async (id, action) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:5000/api/requests/${id}/${action}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setRequests(requests.filter((request) => request._id !== id));
+    } catch (error) {
+      console.error(`Error ${action} request:`, error);
+    }
+  };
+
+  const handleSendRequest = async (userId) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        'http://localhost:5000/api/connect',
+        { receiver: userId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      alert("Connection request sent");
+    } catch (error) {
+      console.error("Error sending connection request:", error);
+    }
+  };
+
+  return (
+    <div>
+      <Header />
+      <div className="network-container">
+        <div className="search-container-network">
+          <div className="search-box-container">
+            <input
+              type="text"
+              placeholder="Search for people"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-box-network"
+            />
+            <button onClick={handleSearch} className="search-button">
+              <FaSearch />
+            </button>
+          </div>
+          <div className="search-results">
+            {searchResults.map((user) => (
+              <div key={user._id} className="user-card">
+                <img src={user.avatar} alt="avatar" className="user-avatar" />
+                <div className="user-details">
+                  <h3>{user.name}</h3>
+                  <p>@{user.username}</p>
+                  <p>{user.summary}</p>
+                </div>
+                <button
+                  onClick={() => handleSendRequest(user._id)}
+                  className="send-request-button"
+                >
+                  <FaUserPlus />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
+        <div className="requests-container">
+          {requests.map((request) => (
+            <div key={request._id} className="request-card">
+              <img
+                src={request.sender.avatar}
+                alt="avatar"
+                className="user-avatar"
+              />
+              <div className="request-details">
+                <h3>{request.sender.name}</h3>
+                <p>@{request.sender.username}</p>
+                <p>{request.sender.summary}</p>
+                <p>
+                  Received on:{" "}
+                  {new Date(request.timestamp).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="request-actions">
+                <button
+                  onClick={() => handleRequestAction(request._id, "accept")}
+                  className="accept-button"
+                >
+                  <FaCheck />
+                </button>
+                <button
+                  onClick={() => handleRequestAction(request._id, "reject")}
+                  className="reject-button"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Network;

@@ -1,38 +1,119 @@
 .network-container {
     display: flex;
+    background-color: var(--background-color); /* Ensure light grey background */
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  .search-container-network {
+    background-color: white; /* Ensure white background */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-}
-
-.profile {
-    margin-bottom: 20px;
-}
-
-.pending-requests {
+  }
+  
+  .search-box-container {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .search-box-network {
     width: 100%;
-    max-width: 600px;
-}
-
-.request-card {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--primary-color);
+    margin-right: 10px; /* Space between search box and button */
+  }
+  
+  .search-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 2.7rem;
+    text-align: center;
+  }
+  
+  .search-results {
+    margin-top: 20px;
+    display: block;
+    max-height: 300px; /* Set a max height */
+    overflow-y: auto; /* Add scroll if results overflow */
+  }
+  
+  .user-card {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
-}
-
-.request-card h3 {
-    margin: 0 0 10px 0;
-}
-
-.request-card p {
-    margin: 5px 0;
-}
-
-.request-card .timestamp {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.request-card button {
+    padding: 10px;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    background-color: white;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     margin-right: 10px;
-}
+  }
+  
+  .user-details {
+    flex: 1;
+  }
+  
+  .send-request-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 1rem;
+  }
+  
+  .requests-container {
+    flex: 2;
+  }
+  
+  .request-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    background-color: white;
+  }
+  
+  .request-details {
+    flex: 1;
+  }
+  
+  .request-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .accept-button {
+    background-color: var(--success-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .reject-button {
+    background-color: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  

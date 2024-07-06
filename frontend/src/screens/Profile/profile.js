@@ -110,8 +110,11 @@ const Profile = () => {
           </form>
         </div>
         <div className="profile-sidebar">
-          <Link to="/profile/workex">+Add Work Experience</Link>
-          <Link to="/profile/password">Edit Password</Link>
+            <h4>More actions</h4>
+          <Link to="/profile/workex" className="btn-secondary">+Add Work Experience</Link>
+          <Link to="/profile/workex" className="btn-secondary">+Add Education Details</Link>
+          <Link to="/profile/workex" className="btn-secondary">+Add Position of Responsibility</Link>
+          <Link to="/profile/password" className="btn-secondary">Edit Password</Link>
         </div>
       </div>
     </div>

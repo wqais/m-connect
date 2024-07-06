@@ -1,21 +1,22 @@
+// src/components/Login.js
+
 import React, { useState } from "react";
-import CardFlip from "react-card-flip";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import "./login.css";
+import axios from "axios";
+import CardFlip from "react-card-flip";
+import "./login.css"; // Import the CSS file for custom styles
 
 const Login = () => {
   const navigate = useNavigate();
   const [isFlipped, setIsFlipped] = useState(false);
-  const [registerDetails, setRegisterDetails] = useState({
-    name: "",
-    email: "",
+  const [loginDetails, setLoginDetails] = useState({
     username: "",
     password: "",
   });
 
-  const [loginDetails, setLoginDetails] = useState({
+  const [registerDetails, setRegisterDetails] = useState({
+    name: "",
+    email: "",
     username: "",
     password: "",
   });
@@ -49,10 +50,10 @@ const Login = () => {
           },
         }
       );
-      const { token, user } = response.data;
-      setAlertMessage(`Login successful! Welcome, ${user.name}`);
-      Cookies.set("token", token, { expires: 1 });
-      navigate("/home");
+      const { token } = response.data;
+      setAlertMessage("Login successful!");
+      localStorage.setItem("token", token);
+      navigate(`/home/${loginDetails.username}`);
     } catch (error) {
       setAlertMessage(
         error.response?.data?.message || "An error occurred during login"
@@ -73,7 +74,6 @@ const Login = () => {
         }
       );
       setAlertMessage("Registration successful! Please log in.");
-      console.log(response);
       setIsFlipped(false);
     } catch (error) {
       setAlertMessage(
@@ -85,7 +85,7 @@ const Login = () => {
   return (
     <div className="login-container">
       {alertMessage && <div className="alert">{alertMessage}</div>}
-      <CardFlip isFlipped={isFlipped}>
+      <CardFlip isFlipped={isFlipped} flipDirection="horizontal">
         <div key="front" className="card">
           <h2>Login</h2>
           <form onSubmit={handleLoginSubmit}>
