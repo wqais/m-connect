@@ -7,7 +7,6 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const auth = require("./middleware/auth"); // Authentication middleware
 
-
 dotenv.config();
 
 const app = express();
@@ -29,7 +28,7 @@ mongoose
 
 const User = require("./models/User");
 const Post = require("./models/Post");
-const Network = require("./models/NetworkDetails")
+const Network = require("./models/NetworkDetails");
 
 // Register endpoint
 app.post("/api/auth/register", async (req, res) => {
@@ -137,20 +136,113 @@ app.post("/api/posts", auth, async (req, res) => {
 
   try {
     const newPost = new Post({
-      author: req.user.username,
+      author: req.user._id,
+      authorName: req.user.username,
+      authorAvatar: req.user.avatar, // Assuming you have avatar in user schema
       timestamp: new Date(),
       body,
     });
 
     await newPost.save();
-    res
-      .status(201)
-      .json({ message: "Post created successfully", post: newPost });
+    res.status(201).json({ message: "Post created successfully", post: newPost });
   } catch (error) {
     console.error("Error creating post:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+app.get("/api/posts/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate("author", "name avatar")
+      .populate("comments.author", "name avatar");
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching post" });
+  }
+});
+
+app.post("/api/posts/:id/like", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (post.likes.includes(req.user._id)) {
+      post.likes.pull(req.user._id);
+    } else {
+      post.likes.push(req.user._id);
+    }
+
+    await post.save();
+    res.status(200).json(post);
+  } catch (error) {
+    res.status(500).json({ message: "Error liking post" });
+  }
+});
+
+app.post("/api/posts/:id/comments", auth, async (req, res) => {
+  try {
+    const { body } = req.body;
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const comment = {
+      author: req.user._id,
+      body,
+    };
+
+    post.comments.push(comment);
+    await post.save();
+
+    res.status(201).json(post);
+  } catch (error) {
+    res.status(500).json({ message: "Error adding comment" });
+  }
+});
+
+app.delete("/api/posts/:postId/comments/:commentId", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const comment = post.comments.id(req.params.commentId);
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    if (
+      comment.author.toString() !== req.user._id.toString() &&
+      post.author.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    post.comments = post.comments.filter(
+      (c) => c._id.toString() !== req.params.commentId
+    );
+
+    // Save the post after the comment has been removed
+    await post.save();
+
+    res.status(200).json({ message: "Comment deleted successfully", post });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    res.status(500).json({ message: "Error deleting comment" });
+  }
+});
+
+
 
 app.get("/search/people", async (req, res) => {
   try {
@@ -214,5 +306,35 @@ app.post('/api/connect', auth, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+app.get('/posts/:username', auth, async (req, res) => {
+  try {
+    const username = req.params.username;
+    const posts = await Post.find({ 'authorName': username }).sort({ createdAt: -1 });
+    if (!posts) {
+      return res.status(404).json({ message: 'No posts found for this user.' });
+    }
+    res.status(200).json({ results: posts });
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ message: 'Server error while fetching posts.' });
+  }
+});
+
+app.get('/view/:username', async (req, res) => {
+  try {
+      const user = await User.findOne({ username: req.params.username });
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 });
+
+      res.status(200).json({ user, posts });
+  } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+  }
+});
+
 
 app.listen(port, () => console.log(`Server running on port ${port}`));

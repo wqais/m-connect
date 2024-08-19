@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Header/header";
 import "./search.css";
@@ -9,6 +9,7 @@ const Search = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searchCategory, setSearchCategory] = useState("");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -44,6 +45,10 @@ const Search = () => {
     fetchSearchResults();
   }, [searchParams]);
 
+  const handlePostClick = (postId) => {
+    navigate(`/post/${postId}`);
+  };
+
   return (
     <div>
       <Header />
@@ -58,13 +63,26 @@ const Search = () => {
                 {searchResults.map((user) => (
                   <li key={user._id} className="user-item">
                     <img
-                      src={user.profilePicture || "path/to/default-profile.png"}
+                      src={user.avatar || "path/to/default-profile.png"}
                       alt={user.username}
                       className="user-avatar"
                     />
                     <div className="user-info">
-                      <p className="user-name">{user.name}</p>
-                      <p className="user-username">@{user.username}</p>
+                      <p
+                        className="user-name"
+                        onClick={() => navigate(`/view/${user.username}`)}
+                      >
+                        {user.name}
+                      </p>
+                      <p
+                        className="user-username"
+                        onClick={() => navigate(`/view/${user.username}`)}
+                      >
+                        @{user.username}
+                      </p>
+                      <p className="user-summary">
+                        {user.summary || "No summary available"}
+                      </p>
                     </div>
                   </li>
                 ))}
@@ -72,10 +90,18 @@ const Search = () => {
             ) : (
               <ul className="post-list">
                 {searchResults.map((post) => (
-                  <li key={post._id} className="post-item">
-                    <p className="post-body">{post.body}</p>
+                  <li
+                    key={post._id}
+                    className="post-item"
+                    onClick={() => handlePostClick(post._id)}
+                  >
+                    <div
+                      className="post-content"
+                      dangerouslySetInnerHTML={{ __html: post.body }}
+                    />
                     <p className="post-date">
-                      {new Date(post.createdAt).toLocaleDateString()}
+                      {new Date(post.timestamp).toLocaleDateString() ||
+                        "Invalid Date"}
                     </p>
                   </li>
                 ))}
@@ -83,7 +109,6 @@ const Search = () => {
             )}
           </div>
         )}
-        
       </div>
     </div>
   );

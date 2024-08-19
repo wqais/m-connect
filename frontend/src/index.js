@@ -13,8 +13,11 @@ import Search from "./screens/Search/search";
 import Network from "./screens/Network/network";
 import Profile from "./screens/Profile/profile";
 import { setCssVariables } from './theme/colors';
+import Post from "./screens/Post/post";
+import ViewPosts from "./screens/Post/viewPosts";
+import ViewProfile from "./screens/View/viewProfile";
 setCssVariables();  // Set CSS variables
-// import Header from "./components/Header/header";
+
 
 function App() {
   const router = createBrowserRouter(
@@ -25,6 +28,9 @@ function App() {
         <Route path="/network" element={<Network />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/home/:username" element={<Home/>}/>
+        <Route path="/post/:id" element={<Post/>}/>
+        <Route path="/posts/:username" element={<ViewPosts/>}/>
+        <Route path="/view/:username" element={<ViewProfile/>}/>
         <Route path="/search" element={<Search />} />
       </>
     )

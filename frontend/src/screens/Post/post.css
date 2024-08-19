@@ -1,0 +1,98 @@
+.post-container {
+  width: 80%;
+  margin: 2rem auto;
+  padding: 20px;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.post-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.post-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--primary-color);
+}
+
+.post-content {
+  margin-bottom: 20px;
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.comment-button, .post-like-button {
+  background-color: var(--highlight-color);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.like-count {
+  font-size: 16px;
+  margin-left: 5px;
+  color: var(--primary-color);
+}
+
+.comment-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--highlight-color);
+  border-radius: 4px;
+}
+
+.delete-button {
+  background-color: red;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.comment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+}

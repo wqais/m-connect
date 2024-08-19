@@ -61,13 +61,21 @@ const Home = () => {
       );
       if (response.status === 201) {
         setPostBody("");
-        console.log("Post created successfully");
+        navigate(`/post/${response.data.post._id}`);
       } else {
         console.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error creating post:", error);
+      if (error.response && error.response.data) {
+        console.error(error.response.data.message);
+      } else {
+        console.error("Error submitting post:", error);
+      }
     }
+  };
+
+  const handleEditorChange = (content, editor) => {
+    setPostBody(content);
   };
 
   const handleSearch = () => {
@@ -117,6 +125,12 @@ const Home = () => {
               >
                 Edit Profile
               </button>
+              <button
+                onClick={() => navigate(`/posts/${username}`)}
+                className="edit-profile-button"
+              >
+                View your posts
+              </button>
             </div>
           </div>
           <div className="post-section">
@@ -132,13 +146,10 @@ const Home = () => {
                   { value: "First.Name", title: "First Name" },
                   { value: "Email", title: "Email" },
                 ],
-                ai_request: (request, respondWith) =>
-                  respondWith.string(() =>
-                    Promise.reject("See docs to implement AI Assistant")
-                  ),
                 height: "200px",
               }}
               initialValue="Start typing..."
+              onEditorChange={handleEditorChange}
             />
             <button onClick={handlePostSubmit} className="post-button">
               Post

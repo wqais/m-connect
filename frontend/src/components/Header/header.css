@@ -66,3 +66,8 @@
     background-color: #E0E1DD; /* light gray on hover */
     color: #0D1B2A; /* dark blue text on hover */
 }
+
+.logo{
+    object-fit: cover;
+    /* width: 100%; */
+}

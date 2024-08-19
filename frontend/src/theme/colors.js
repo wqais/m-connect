@@ -8,10 +8,8 @@ const colors = {
     background: '#E0E1DD'
 };
 
-// Export colors object
 export default colors;
 
-// Set CSS variables in a CSS file or a global stylesheet
 export const setCssVariables = () => {
     document.documentElement.style.setProperty('--primary-color', colors.primary);
     document.documentElement.style.setProperty('--secondary-color', colors.secondary);

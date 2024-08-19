@@ -1,5 +1,3 @@
-// src/components/Login.js
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -21,11 +19,11 @@ const Login = () => {
     password: "",
   });
 
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertMessages, setAlertMessages] = useState([]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
-    setAlertMessage(""); // Clear any existing alerts when flipping the card
+    setAlertMessages([]); // Clear any existing alerts when flipping the card
   };
 
   const handleLoginChange = (e) => {
@@ -51,13 +49,14 @@ const Login = () => {
         }
       );
       const { token } = response.data;
-      setAlertMessage("Login successful!");
+      setAlertMessages([...alertMessages, "Login successful!"]);
       localStorage.setItem("token", token);
       navigate(`/home/${loginDetails.username}`);
     } catch (error) {
-      setAlertMessage(
-        error.response?.data?.message || "An error occurred during login"
-      );
+      setAlertMessages([
+        ...alertMessages,
+        error.response?.data?.message || "An error occurred during login",
+      ]);
     }
   };
 
@@ -73,18 +72,18 @@ const Login = () => {
           },
         }
       );
-      setAlertMessage("Registration successful! Please log in.");
+      setAlertMessages([...alertMessages, "Registration successful! Please log in."]);
       setIsFlipped(false);
     } catch (error) {
-      setAlertMessage(
-        error.response?.data?.message || "An error occurred during registration"
-      );
+      setAlertMessages([
+        ...alertMessages,
+        error.response?.data?.message || "An error occurred during registration",
+      ]);
     }
   };
 
   return (
     <div className="login-container">
-      {alertMessage && <div className="alert">{alertMessage}</div>}
       <CardFlip isFlipped={isFlipped} flipDirection="horizontal">
         <div key="front" className="card">
           <h2>Login</h2>
@@ -167,6 +166,14 @@ const Login = () => {
           </p>
         </div>
       </CardFlip>
+
+      <div className="alert-container">
+        {alertMessages.map((message, index) => (
+          <div key={index} className="alert">
+            {message}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

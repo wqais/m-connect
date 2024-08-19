@@ -110,6 +110,7 @@ const Network = () => {
           </div>
         </div>
         <div className="requests-container">
+          <h4 className="requests-heading">Pending Requests</h4>
           {requests.map((request) => (
             <div key={request._id} className="request-card">
               <img
