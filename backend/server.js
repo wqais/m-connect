@@ -144,7 +144,9 @@ app.post("/api/posts", auth, async (req, res) => {
     });
 
     await newPost.save();
-    res.status(201).json({ message: "Post created successfully", post: newPost });
+    res
+      .status(201)
+      .json({ message: "Post created successfully", post: newPost });
   } catch (error) {
     console.error("Error creating post:", error);
     res.status(500).json({ message: "Server error" });
@@ -189,21 +191,24 @@ app.post("/api/posts/:id/comments", auth, async (req, res) => {
   try {
     const { body } = req.body;
     const post = await Post.findById(req.params.id);
-
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
-
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const comment = {
       author: req.user._id,
+      authorName: user.username,
       body,
     };
-
     post.comments.push(comment);
+    console.log(comment);
     await post.save();
-
     res.status(201).json(post);
   } catch (error) {
+    console.error("Error adding comment:", error);
     res.status(500).json({ message: "Error adding comment" });
   }
 });
@@ -242,8 +247,6 @@ app.delete("/api/posts/:postId/comments/:commentId", auth, async (req, res) => {
   }
 });
 
-
-
 app.get("/search/people", async (req, res) => {
   try {
     const { term } = req.query;
@@ -276,30 +279,29 @@ app.get("/api/requests", auth, async (req, res) => {
   }
 });
 
-app.post('/api/connect', auth, async (req, res) => {
+app.post("/api/connect", auth, async (req, res) => {
   try {
     const { receiver } = req.body;
     const sender = req.user._id;
-    // Check if the receiver exists
     const receiverUser = await User.findById(receiver);
+    console.log(sender);
     if (!receiverUser) {
-      return res.status(404).json({ message: 'Receiver not found' });
+      return res.status(404).json({ message: "Receiver not found" });
     }
-    // Check if a request already exists
     const existingRequest = await Network.findOne({
       sender,
       receiver,
     });
     if (existingRequest) {
-      return res.status(400).json({ message: 'Connection request already sent' });
+      return res
+        .status(400)
+        .json({ message: "Connection request already sent" });
     }
-    // Create a new connection request
     const newRequest = new Network({
       sender,
       receiver,
-      status: 'pending',
+      status: "pending",
     });
-
     await newRequest.save();
     res.status(201).json(newRequest);
   } catch (error) {
@@ -307,32 +309,130 @@ app.post('/api/connect', auth, async (req, res) => {
   }
 });
 
-app.get('/posts/:username', auth, async (req, res) => {
+app.get("/posts/:username", auth, async (req, res) => {
   try {
     const username = req.params.username;
-    const posts = await Post.find({ 'authorName': username }).sort({ createdAt: -1 });
+    const posts = await Post.find({ authorName: username }).sort({
+      createdAt: -1,
+    });
     if (!posts) {
-      return res.status(404).json({ message: 'No posts found for this user.' });
+      return res.status(404).json({ message: "No posts found for this user." });
     }
     res.status(200).json({ results: posts });
   } catch (error) {
-    console.error('Error fetching posts:', error);
-    res.status(500).json({ message: 'Server error while fetching posts.' });
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Server error while fetching posts." });
   }
 });
 
-app.get('/view/:username', async (req, res) => {
+app.get("/view/:username", async (req, res) => {
   try {
-      const user = await User.findOne({ username: req.params.username });
-      if (!user) {
-          return res.status(404).json({ message: 'User not found' });
-      }
+    const user = await User.findOne({ username: req.params.username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-      const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 });
+    const posts = await Post.find({ author: user._id }).sort({ createdAt: -1 });
 
-      res.status(200).json({ user, posts });
+    res.status(200).json({ user, posts });
   } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+app.get("/me", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.delete("/post/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    console.log(post);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    if (post.author.toString() !== req.user.id) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to delete this post" });
+    }
+    await Post.deleteOne(post);
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.post("/api/requests/:id/:action", auth, async (req, res) => {
+  const { id, action } = req.params;
+  try {
+    const request = await Network.findById(id);
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+    if (
+      request.receiver.toString() !== req.user.id &&
+      request.sender.toString() !== req.user.id
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to act on this request" });
+    }
+    if (action === "accept") {
+      request.status = "accepted";
+      await request.save();
+      // Add the connection to both sender and receiver
+      const sender = await User.findById(request.sender);
+      const receiver = await User.findById(request.receiver);
+      if (!sender || !receiver) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.status(200).json({ message: "Connection request accepted" });
+    } else if (action === "reject") {
+      await Network.deleteOne(request)
+      return res.status(200).json({ message: "Connection request rejected" });
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+  } catch (err) {
+    console.error("Server error:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+app.get("/api/connections", auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const connections = await Network.find({
+      $or: [
+        { sender: userId, status: "accepted" },
+        { receiver: userId, status: "accepted" }
+      ]
+    }).populate('sender receiver', 'name username'); // Populate sender and receiver
+
+    // Filter out the current user's details
+    const filteredConnections = connections.map(connection => {
+      const isSender = connection.sender._id.toString() === userId;
+      const userDetails = isSender ? connection.receiver : connection.sender;
+      return {
+        _id: connection._id,
+        name: userDetails.name,
+        username: userDetails.username
+      };
+    });
+
+    console.log(filteredConnections); // For debugging
+    res.json(filteredConnections);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 });
 

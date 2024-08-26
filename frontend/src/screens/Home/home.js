@@ -110,27 +110,35 @@ const Home = () => {
           </button>
         </div>
         <div className="home-content">
-          <div className="profile-section">
-            {user && user.avatar ? (
-              <img src={user.avatar} alt="Avatar" className="avatar" />
-            ) : (
-              <FaUser className="profile-icon" />
-            )}
-            <div className="profile-details">
-              <h2>{user?.name}</h2>
-              <p>@{user?.username}</p>
-              <button
-                onClick={() => navigate("/profile")}
-                className="edit-profile-button"
-              >
-                Edit Profile
-              </button>
-              <button
-                onClick={() => navigate(`/posts/${username}`)}
-                className="edit-profile-button"
-              >
-                View your posts
-              </button>
+          <div className="home-content">
+            <div className="profile-section">
+              <div className="user-profile">
+                <div className="avatar-container">
+                  {user && user.avatar ? (
+                    <img src={user.avatar} alt="Avatar" className="avatar" />
+                  ) : (
+                    <FaUser className="profile-icon" />
+                  )}
+                  <div className="user-block-info">
+                    <h2>{user?.name}</h2>
+                    <p>@{user?.username}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="profile-details">
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="edit-profile-button"
+                >
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => navigate(`/posts/${user?.username}`)}
+                  className="view-posts-button"
+                >
+                  View Your Posts
+                </button>
+              </div>
             </div>
           </div>
           <div className="post-section">

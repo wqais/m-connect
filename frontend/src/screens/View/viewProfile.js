@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Header/header";
+import { FaUser } from "react-icons/fa";
 import "./viewProfile.css";
 
 const ViewProfile = () => {
@@ -12,7 +13,9 @@ const ViewProfile = () => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/view/${username}`);
+        const response = await axios.get(
+          `http://localhost:5000/view/${username}`
+        );
         if (response.status === 200) {
           setUser(response.data.user);
           setPosts(response.data.posts);
@@ -36,11 +39,13 @@ const ViewProfile = () => {
       <Header />
       <div className="profile-container">
         <div className="user-info">
-          <img src={user.avatar || "path/to/default-avatar.png"} alt="Avatar" className="user-avatar" />
+          <div className="avatar-container">
+            <FaUser className="post-profile-icon" />
+          </div>
           <div className="user-details">
             <h1>{user.name}</h1>
             <p>@{user.username}</p>
-            <p>{user.email}</p>
+            <p>Email: {user.email}</p>
             <p>{user.summary}</p>
           </div>
         </div>
@@ -52,8 +57,13 @@ const ViewProfile = () => {
           ) : (
             posts.map((post) => (
               <div key={post._id} className="post-item">
-                <div className="post-content" dangerouslySetInnerHTML={{ __html: post.body }}></div>
-                <p className="post-date">{new Date(post.timestamp).toLocaleDateString()}</p>
+                <div
+                  className="post-content"
+                  dangerouslySetInnerHTML={{ __html: post.body }}
+                ></div>
+                <p className="post-date">
+                  {new Date(post.timestamp).toLocaleDateString()}
+                </p>
               </div>
             ))
           )}

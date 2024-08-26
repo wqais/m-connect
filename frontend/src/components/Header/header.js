@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaUserFriends, FaEnvelope, FaBell } from 'react-icons/fa';
 import axios from 'axios';
@@ -7,7 +7,35 @@ import { FaConnectdevelop } from 'react-icons/fa';
 
 const Header = () => {
     const navigate = useNavigate();
-    const username = localStorage.getItem('username');
+    const [username, setUserName] = useState(null);
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get(
+              'http://localhost:5000/me',
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              }
+            );
+            if (response.status === 200) {
+              setUserName(response.data.username);
+            } else {
+              console.error(response.data.message);
+            }
+          } catch (error) {
+            if (error.response && error.response.data) {
+              console.error(error.response.data.message);
+            } else {
+              console.error("Error fetching data:", error);
+            }
+          }
+        };
+    
+        fetchData();
+      }, [username]);
 
     const handleSignOut = async () => {
         try {

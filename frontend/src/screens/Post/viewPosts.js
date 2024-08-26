@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Header/header";
-import { FaHeart } from "react-icons/fa";
 import "./viewPosts.css";
 
 const ViewPosts = () => {
@@ -45,13 +44,13 @@ const ViewPosts = () => {
     <div>
       <Header />
       <div className="view-posts-container">
-        <h1 className="view-posts-heading">{username}'s Posts</h1>
+        <h3 className="view-posts-heading">Your Posts</h3>
         {loading ? (
           <p>Loading...</p>
         ) : posts.length === 0 ? (
           <p>No posts found.</p>
         ) : (
-          <ul className="post-list">
+          <ul className="user-post-list">
             {posts.map((post) => (
               <li
                 key={post._id}
@@ -65,12 +64,6 @@ const ViewPosts = () => {
                 <p className="post-date">
                   {new Date(post.timestamp).toLocaleDateString()}
                 </p>
-                <button
-                  className="post-like-button like-btn"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <FaHeart/>
-                </button>
               </li>
             ))}
           </ul>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { FaUser } from "react-icons/fa";
 import axios from "axios";
 import Header from "../../components/Header/header";
 import "./search.css";
@@ -62,11 +63,7 @@ const Search = () => {
               <ul className="user-list">
                 {searchResults.map((user) => (
                   <li key={user._id} className="user-item">
-                    <img
-                      src={user.avatar || "path/to/default-profile.png"}
-                      alt={user.username}
-                      className="user-avatar"
-                    />
+                    <FaUser className="search-profile-icon"/>
                     <div className="user-info">
                       <p
                         className="user-name"
@@ -99,7 +96,7 @@ const Search = () => {
                       className="post-content"
                       dangerouslySetInnerHTML={{ __html: post.body }}
                     />
-                    <p className="post-date">
+                    <p className="search-post-date">
                       {new Date(post.timestamp).toLocaleDateString() ||
                         "Invalid Date"}
                     </p>

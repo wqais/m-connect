@@ -1,6 +1,8 @@
 .search-container {
   padding: 20px;
   background-color: var(--background-color);
+  width: 90%;
+  margin: 1rem auto;
 }
 
 .search-heading {
@@ -14,6 +16,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 80%;
 }
 
 .user-list, .post-list {
@@ -21,22 +24,22 @@
   padding: 0;
   margin: 0;
   width: 100%;
-  max-width: 1000px; /* Increase the maximum width */
 }
 
 .user-item, .post-item {
   display: flex;
   align-items: center;
-  background-color: var(--secondary-color);
+  background-color: white;
   border-radius: 5px;
   padding: 15px;
   margin-bottom: 10px;
-  color: var(--background-color);
+  width: 80%;
+  margin: auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.user-avatar {
-  width: 60px; /* Increase the avatar size */
+/* .user-avatar {
+  width: 60px;
   height: 60px;
   border-radius: 50%;
   margin-right: 20px;
@@ -49,28 +52,34 @@
 }
 
 .user-name, .user-username {
-  font-size: 18px; /* Increase the font size */
   cursor: pointer;
+  font-weight: bold;
 }
 
 .user-name:hover, .user-username:hover {
-  text-decoration: underline; /* Add underline on hover */
-}
+  text-decoration: underline;
+} */
 
 .user-summary {
   margin-top: 5px;
   color: var(--highlight-color);
   font-size: 14px;
+} */
+
+.post-item{
+  display: flex;
+  justify-content: space-between;
 }
 
 .post-body {
   margin: 0;
 }
 
-.post-date {
+.search-post-date {
   text-align: right;
   color: var(--highlight-color);
   font-size: 12px;
+  
 }
 
 .like-button {
@@ -86,3 +95,61 @@
 .like-button:hover {
   background-color: var(--highlight-color);
 }
+
+.search-profile-icon{
+  height: 40px;
+  width: 40px;
+  padding: 4px;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.user-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-item {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.user-item:hover {
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin-bottom: -1rem;
+}
+
+.user-name, .user-username {
+  margin: 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.user-name {
+  font-size: 1.2rem;
+}
+
+.user-username {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.user-summary {
+  margin: 5px 0 0;
+  color: #495057;
+}
+
